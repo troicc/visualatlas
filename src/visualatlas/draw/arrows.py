@@ -400,8 +400,15 @@ def _evaluate(S, src, dst, tail, tip, k, s, scene, side=None, own=False, hint=0)
         if dl.min() < 0.1 * B:
             bad.append(f"箭身贴着 {nm}.{kk} 的孤对点")
             break
-    for Q in curls + paths:
-        dq = np.hypot(*(P[:, None, :] - Q[None]).transpose(2, 0, 1)).min()
+    for j, Q in enumerate(curls + paths):
+        Pq = P
+        if dst[0] == "mid" and j < len(curls):
+            # two fish-hooks that make one bond meet between its atoms by design: compare only the first 75 %
+            # of both shafts, so the tips may come close (added 2026-11-07, not in the ported engine)
+            other = S.__dict__["curls"][j]["dst"]
+            if other[0] == "mid" and {tuple(other[1:3]), tuple(other[3:5])} == {tuple(dst[1:3]), tuple(dst[3:5])}:
+                Pq, Q = P[: int(len(P) * 0.75)], Q[: int(len(Q) * 0.75)]
+        dq = np.hypot(*(Pq[:, None, :] - Q[None]).transpose(2, 0, 1)).min()
         if dq < 0.22 * B:
             bad.append("与另一根箭头相交或贴近")
             break
