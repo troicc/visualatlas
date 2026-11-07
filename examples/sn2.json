@@ -1,0 +1,32 @@
+{
+  "format": "visualatlas-mechanism/0.1",
+  "title": "SN2: hydroxide and ethyl bromide",
+  "steps": [
+    {
+      "species": "C[CH2:1][Br:2].[OH-:3]",
+      "moves": [
+        {
+          "e": 2,
+          "from": [
+            3
+          ],
+          "to": [
+            3,
+            1
+          ]
+        },
+        {
+          "e": 2,
+          "from": [
+            1,
+            2
+          ],
+          "to": [
+            2
+          ]
+        }
+      ]
+    }
+  ],
+  "final": "CCO.[Br-]"
+}

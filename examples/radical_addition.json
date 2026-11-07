@@ -1,0 +1,44 @@
+{
+  "format": "visualatlas-mechanism/0.1",
+  "title": "Methyl radical adding to propene",
+  "steps": [
+    {
+      "species": "[CH3:1].[CH2:2]=[CH:3]C",
+      "moves": [
+        {
+          "e": 1,
+          "from": [
+            1
+          ],
+          "to": [
+            1,
+            2
+          ]
+        },
+        {
+          "e": 1,
+          "from": [
+            2,
+            3
+          ],
+          "to": [
+            1,
+            2
+          ]
+        },
+        {
+          "e": 1,
+          "from": [
+            2,
+            3
+          ],
+          "to": [
+            3
+          ]
+        }
+      ],
+      "label": "addition"
+    }
+  ],
+  "final": "[CH3:1][CH2:2][CH:3]C"
+}

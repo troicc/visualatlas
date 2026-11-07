@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "visualatlas mechanism",
+  "type": "object",
+  "required": [
+    "steps"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "visualatlas-mechanism/0.1"
+    },
+    "title": {
+      "type": "string"
+    },
+    "source": {
+      "type": "object",
+      "description": "where the mechanism comes from (dataset, row, DOI)"
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "species",
+          "moves"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "species": {
+            "type": "string",
+            "description": "state before the step; SMILES with atom maps"
+          },
+          "moves": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "e",
+                "from",
+                "to"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "e": {
+                  "enum": [
+                    1,
+                    2
+                  ],
+                  "description": "2 = curved arrow, 1 = fish-hook"
+                },
+                "from": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "minItems": 1,
+                  "maxItems": 2,
+                  "description": "[atom] or [atom, atom] (a bond)"
+                },
+                "to": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "minItems": 1,
+                  "maxItems": 2,
+                  "description": "[atom] or [atom, atom] (a bond)"
+                },
+                "side": {
+                  "enum": [
+                    "up",
+                    "down",
+                    "left",
+                    "right"
+                  ]
+                }
+              }
+            }
+          },
+          "label": {
+            "type": "string"
+          },
+          "conditions": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "final": {
+      "type": "string",
+      "description": "state after the last step"
+    }
+  }
+}
