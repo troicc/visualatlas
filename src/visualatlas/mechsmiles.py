@@ -1,5 +1,7 @@
 """Parse MechSMILES (Neukomm, Jončev, Schwaller, arXiv 2512.05722) into an RDKit molecule and a list of arrows.
 
+【标注】本文件由 AI（Claude）编写，作者待精读，见 docs/STUDY_checker.md。
+
 A MechSMILES step is "<mapped SMILES>|<arrow>;<arrow>;...". Arrows refer to atom-map numbers:
 
     (a, b)        the lone pair on atom a attacks atom b          -> Arrow('lp', (a,), b)
@@ -62,6 +64,7 @@ def read_mol(smiles):
     if mol is None:
         raise ValueError(f"unparsable SMILES: {smiles}")
     mol.UpdatePropertyCache(strict=False)
+    Chem.AssignRadicals(mol)  # bracket atoms with unfilled valence ([O], [CH3]) carry unpaired electrons
     Chem.Kekulize(mol, clearAromaticFlags=True)
     return mol
 
@@ -78,7 +81,12 @@ def parse(mech_smi):
 
 def canonical(mol_or_smiles):
     """Canonical SMILES without atom maps, for comparing two states. Returns None if RDKit cannot sanitise it."""
-    m = Chem.MolFromSmiles(mol_or_smiles, sanitize=False) if isinstance(mol_or_smiles, str) else Chem.Mol(mol_or_smiles)
+    if isinstance(mol_or_smiles, str):
+        m = Chem.MolFromSmiles(mol_or_smiles, sanitize=False)
+        m.UpdatePropertyCache(strict=False)
+        Chem.AssignRadicals(m)  # keep [O], [CH2] as radicals when the map numbers are stripped
+    else:
+        m = Chem.Mol(mol_or_smiles)
     for a in m.GetAtoms():
         a.SetAtomMapNum(0)
     m = Chem.MolFromSmiles(Chem.MolToSmiles(m))
