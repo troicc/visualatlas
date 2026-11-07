@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+dist/
+build/
+.DS_Store
+
+# 下载的数据集与生成物不入库
+data/raw/
+out/
+
+# 密钥
+.env
+config/*.json
