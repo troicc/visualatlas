@@ -31,18 +31,26 @@ src/visualatlas/
   draw/arrows.py      弯箭头：圆弧，在硬检查下穷举落点与拱高
   draw/canvas.py      画布：放分子、孤对、单电子、弯箭头、反应箭头；汇总全部违规
   stereo.py           从画出的楔形反推立体中心的 CIP 构型
+  mechsmiles.py       MechSMILES 解析：带原子映射的分子图和箭头列表
+  check/              核对器（目前只有接口说明）
+baselines/            对照组脚本（ChRIMP 自带可视化）
+tests/data/           测试数据及其来源和许可证说明
   demo.py             示例
 ```
 
 ## 现状
 
 - **已有（第 1 周）**：绘图层，从作者此前的讲义引擎移植而来。移植时与原引擎在同一组场景上逐字比对，SVG 输出和检查结果完全一致。
-- **还没有**：化学模型（RDKit 分子图）、核对器、MechSMILES 导入、自动排版。
+- **已有**：MechSMILES 解析器；核对器的接口说明和测试。测试用的是 40 个基元步，标准答案有两个互相独立的来源印证。
+- **还没有**：核对器的实现（第 2 周，由作者亲手写）、自动排版。
 - 方向和节奏见 [`PLAN.md`](PLAN.md)，设计取舍随做随记在 [`DECISIONS.md`](DECISIONS.md)。
 
 在 2026-12-20 公开之前，仓库保持私有。
 
 ## 与相关工作的关系
 
-- [MechSMILES / ChRIMP](https://github.com/schwallergroup/ChRIMP)（MIT）：输入格式和对照组都取自这里。ChRIMP 的 `check_validity()` 目前是占位函数；它的环境只覆盖极性、闭壳层机理。本项目补上的是：机理的可视化与核对，以及对自由基、金属、立体中心的覆盖。
+- [MechSMILES / ChRIMP](https://github.com/schwallergroup/ChRIMP)（MIT）：输入格式和对照组都取自这里。
+  - ChRIMP 能做的检查：逐原子电子计数，以及 `MoleculeSet.check_step_legality`，后者判断两个状态之间是否存在一种合法的单步箭头组合。`MechSmiles.check_validity()` 仍是占位函数。
+  - 本项目核对的是另一件事：画出来的这几根箭头，推出来的是不是画出来的下一格；不是的话，错在哪一根箭头、哪个原子。
+  - 本项目补上的覆盖：自由基、金属和立体中心。ChRIMP 生成中间体时会丢掉立体标记，见 `tests/data/README.md`。
 - 排版和弯箭头几何沿用作者此前为讲义写的绘图规则（ACS 1996 参数），只移植通用部分，不含讲义素材。
