@@ -15,9 +15,28 @@
 
 ```bash
 pip install -e ".[dev]"
-visualatlas-demo demo.svg      # 手写的一步：HO⁻ 加成到丙酮羰基，检查后输出 SVG
-pytest -q
+visualatlas check examples/radical_addition.json              # 逐步做形式核对
+visualatlas draw examples/radical_addition.json out.svg       # 出图，并列出几何违规
+visualatlas convert mechsmiles steps.txt -o mech.json         # 每行一个 MechSMILES，按正向顺序排列
+pytest -q                                                     # 慢测试另跑：pytest -m slow
 ```
+
+### 机理文件（JSON）
+
+格式说明在 [`schema/mechanism.schema.json`](schema/mechanism.schema.json)，例子在 `examples/`。
+
+- 每一步给出这一步之前的状态（带原子映射的 SMILES）和一串电子移动。
+- 一个电子移动是：从原子 `[a]` 或键 `[a, b]`，把 1 个电子（鱼钩箭头）或 2 个电子（普通弯箭头）搬到原子或键上。
+- 画法提示可以选填，目前只有 `side`，即弯箭头往哪边拱。
+
+```json
+{"steps": [{"species": "C[CH2:1][Br:2].[OH-:3]",
+            "moves": [{"e": 2, "from": [3], "to": [3, 1]},
+                      {"e": 2, "from": [1, 2], "to": [2]}]}],
+ "final": "CCO.[Br-]"}
+```
+
+MechSMILES 和 RMechDB 都是导入格式，统一转成这个 JSON；核对器、渲染器和 LLM 都读写这一种格式。
 
 需要一个与 Arial 字宽一致的字体：macOS 和 Windows 自带的 Arial 即可；Linux 上装 Liberation Sans（`apt install fonts-liberation`）。也可以用环境变量 `VISUALATLAS_FONT` 指定 .ttf 文件。
 
@@ -32,6 +51,9 @@ src/visualatlas/
   draw/canvas.py      画布：放分子、孤对、单电子、弯箭头、反应箭头；汇总全部违规
   stereo.py           从画出的楔形反推立体中心的 CIP 构型
   mechsmiles.py       MechSMILES 解析：带原子映射的分子图和箭头列表
+  mechjson.py         机理文件（JSON）：schema、读写、导入、逐步核对
+  render.py           出图：机理文件 → SVG（第 0 版：RDKit 坐标 + 启发式摆放 + 弯箭头搜索）
+  cli.py              命令行
   moves.py            统一的电子移动表示（1 个或 2 个电子）
   rmechdb.py          RMechDB 读取
   check/              核对器：电子账本
@@ -49,7 +71,10 @@ tests/data/           测试数据及其来源和许可证说明
   - MechSMILES 与 RMechDB 的读取；
   - 核对器：电子账本，同时处理极性箭头和鱼钩箭头，并比对立体中心。【标注】这部分由 AI 编写，作者待精读，见 [`docs/STUDY_checker.md`](docs/STUDY_checker.md)。
   - RMechDB 全量审计：5,426 行中 19 行被标出，逐条人工看过，都是数据本身的错误，见 [`docs/audit_notes.md`](docs/audit_notes.md)。
-- **还没有**：自动排版。
+  - 机理文件（JSON）与出图第 0 版：RDKit 坐标、启发式摆放片段、在硬检查下搜索弯箭头。
+    - 3 个简单例子（SN2、过氧化物均裂、甲基自由基加成）都是 0 违规。
+    - 40 个测试步骤里只有 3 步 0 违规，平均每张图 3.7 处。这就是之后排版搜索要比的基线。
+- **还没有**：排版搜索、与引擎无关的违规检测器。
 - 方向和节奏见 [`PLAN.md`](PLAN.md)，设计取舍随做随记在 [`DECISIONS.md`](DECISIONS.md)。
 
 在 2026-12-20 公开之前，仓库保持私有。

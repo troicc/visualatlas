@@ -11,6 +11,9 @@
 | `src/visualatlas/mechsmiles.py` | 100 | MechSMILES 解析，规范 SMILES |
 | `src/visualatlas/rmechdb.py` | 70 | RMechDB 读取 |
 | `scripts/audit_rmechdb.py` | 70 | 对 RMechDB 全量审计 |
+| `src/visualatlas/mechjson.py` | 200 | 机理文件（JSON）：schema、读写、导入、逐步核对 |
+| `src/visualatlas/render.py` | 330 | 出图第 0 版 |
+| `src/visualatlas/cli.py` | 80 | 命令行 |
 | `tests/test_check.py`、`tests/test_check_radicals.py` | 250 | 期望行为 |
 
 建议的阅读顺序：`moves.py`，然后 `check/__init__.py` 开头的长注释，然后 `_Ledger`，然后 `check_step`，最后是测试。
